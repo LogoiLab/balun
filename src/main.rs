@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+#![allow(unused_imports)]
 
 mod commands;
 mod config;
@@ -25,7 +26,7 @@ impl EventHandler for Handler {
 
             let content = match command.data.name.as_str() {
                 "ping" => commands::ping::run(&command.data.options),
-                "op" => commands::op::run(&command.data.options),
+                "op" => commands::op::run(&command),
                 //"attachmentinput" => commands::attachmentinput::run(&command.data.options),
                 _ => "not implemented :(".to_string(),
             };
@@ -54,7 +55,10 @@ impl EventHandler for Handler {
         );
 
         let commands = GuildId::set_application_commands(&guild_id, &ctx.http, |commands| {
-            commands.create_application_command(|command| commands::ping::register(command))
+            commands
+                .create_application_command(|command| commands::ping::register(command))
+                .create_application_command(|command| commands::op::register(command))
+
             /*.create_application_command(|command| commands::id::register(command))
             .create_application_command(|command| commands::welcome::register(command))
             .create_application_command(|command| commands::numberinput::register(command))

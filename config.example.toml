@@ -1,13 +1,16 @@
+tos_path = "/balun/tos"
+privacy_path = "/balun/privacy"
+
 [discord]
-perm_int = 326417542208
-app_id = ""
-pub_key = ""
+guild_id = ""
+token = ""
 client_id = ""
-client_secret = ""
+perm_int = 326417542208
+scope = "bot%20applications.commands"
 
 [webserver]
 listen_address = "127.0.0.1"
 listen_port = 8686
 
 [interaction]
-operators = ["DiscordUser#1234", "DiscoloredLoser#5678"]
+operators = [1234567890, 0987654321]

@@ -13,4 +13,4 @@ listen_address = "127.0.0.1"
 listen_port = 8686
 
 [interaction]
-operators = [1234567890, 0987654321]
+operators = [1234567890, 9876543210]

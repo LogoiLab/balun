@@ -1,47 +1,19 @@
 #![allow(dead_code)]
 
 mod commands;
+mod config;
 
 use std::env;
 
-use serde::Deserialize;
 use serenity::async_trait;
 use serenity::model::application::command::Command;
 use serenity::model::application::interaction::{Interaction, InteractionResponseType};
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
-use serenity::model::id::CommandId;
-use serenity::model::id::GuildId;
+use serenity::model::id::{ChannelId, CommandId, GuildId, MessageId};
 use serenity::prelude::*;
 
-#[derive(Debug, Deserialize)]
-struct Config {
-    tos_path: String,
-    privacy_path: String,
-    discord: DiscordConfig,
-    webserver: WebConfig,
-    interaction: IntConfig,
-}
-
-#[derive(Debug, Deserialize)]
-struct DiscordConfig {
-    guild_id: String,
-    token: String,
-    client_id: String,
-    perm_int: i64,
-    scope: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct WebConfig {
-    listen_address: String,
-    listen_port: u16,
-}
-
-#[derive(Debug, Deserialize)]
-struct IntConfig {
-    operators: Vec<i64>,
-}
+use config::Config;
 
 struct Handler;
 
@@ -53,7 +25,7 @@ impl EventHandler for Handler {
 
             let content = match command.data.name.as_str() {
                 "ping" => commands::ping::run(&command.data.options),
-                //"id" => commands::id::run(&command.data.options),
+                "op" => commands::op::run(&command.data.options),
                 //"attachmentinput" => commands::attachmentinput::run(&command.data.options),
                 _ => "not implemented :(".to_string(),
             };
@@ -113,12 +85,8 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    // Configure the bot
-    let toml_str = match std::fs::read_to_string("config.toml") {
-        Ok(o) => o,
-        Err(e) => panic!("Could not find config file: {}", e),
-    };
-    let config: Config = toml::from_str(toml_str.as_str()).unwrap();
+    // configure the bot.
+    let config = Config::read_from_file("config.toml");
     env::set_var("GUILD_ID", config.discord.guild_id);
     //print oauth join link
     println!(

@@ -5,7 +5,7 @@ privacy_path = "/balun/privacy"
 guild_id = ""
 token = ""
 client_id = ""
-perm_int = 326417542208
+perm_int = 326484716608
 scope = "bot%20applications.commands"
 
 [webserver]

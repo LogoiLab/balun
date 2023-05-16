@@ -1,0 +1,10 @@
+[discord]
+perm_int = 326417542208
+app_id = ""
+pub_key = ""
+client_id = ""
+client_secret = ""
+
+[webserver]
+listen_address = "127.0.0.1"
+listen_port = 8686

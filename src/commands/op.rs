@@ -24,12 +24,6 @@ pub async fn run(ctx: &mut Context, command: &ApplicationCommandInteraction) -> 
         .expect("failed to get command member.")
         .user
         .id;
-    if to_be_oped.as_u64() == calling_member.as_u64() {
-        return "You are already a bot operator.".into();
-    } else {
-        println!("to be oped: {:?}", to_be_oped);
-        println!("calling member: {:?}", calling_member);
-    }
     let option = command
         .data
         .options
@@ -46,6 +40,13 @@ pub async fn run(ctx: &mut Context, command: &ApplicationCommandInteraction) -> 
         .operators
         .contains(&i64::try_from(calling_member.as_u64().clone()).unwrap())
     {
+        if to_be_oped.as_u64() == calling_member.as_u64() {
+            return "You are already a bot operator.".into();
+        } else {
+            println!("to be oped: {:?}", to_be_oped);
+            println!("calling member: {:?}", calling_member);
+        }
+
         if let CommandDataOptionValue::User(_user, _member) = option {
             config
                 .interaction

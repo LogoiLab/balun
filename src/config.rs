@@ -14,7 +14,7 @@ pub struct Config {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DiscordConfig {
-    pub guild_id: String,
+    pub guild_ids: Vec<i64>,
     pub token: String,
     pub client_id: String,
     pub perm_int: i64,
@@ -30,6 +30,12 @@ pub struct WebConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IntConfig {
     pub operators: Vec<i64>,
+}
+
+pub struct ConfigData;
+
+impl serenity::prelude::TypeMapKey for ConfigData {
+    type Value = Config;
 }
 
 impl Config {

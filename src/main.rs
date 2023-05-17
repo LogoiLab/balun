@@ -14,22 +14,22 @@ use serenity::model::gateway::Ready;
 use serenity::model::id::{ChannelId, CommandId, GuildId, MessageId};
 use serenity::prelude::*;
 
-use config::Config;
+use crate::config::{Config, ConfigData};
 
 struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
+    async fn interaction_create(&self, mut ctx: Context, interaction: Interaction) {
         if let Interaction::ApplicationCommand(command) = interaction {
             println!("Received command interaction: {:#?}", command);
 
             let content = match command.data.name.as_str() {
                 "ping" => commands::ping::run(&command.data.options),
-                "op" => commands::op::run(&command),
-                "deop" => commands::deop::run(&command),
+                "op" => commands::op::run(&mut ctx, &command).await,
+                "deop" => commands::deop::run(&mut ctx, &command).await,
                 "help" => commands::help::run(&command.data.options),
-                "truncate" => commands::truncate::run(&command),
+                "truncate" => commands::truncate::run(&mut ctx, &command).await,
                 //"attachmentinput" => commands::attachmentinput::run(&command.data.options),
                 _ => "not implemented :(".to_string(),
             };
@@ -49,15 +49,12 @@ impl EventHandler for Handler {
 
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
+        let data = ctx.data.read().await;
+        let config = data.get::<ConfigData>().unwrap();
+        for guild in config.discord.guild_ids.clone() {
+            let guild_id = GuildId(guild as u64);
 
-        let guild_id = GuildId(
-            env::var("GUILD_ID")
-                .expect("Did not find guild_id in config")
-                .parse()
-                .expect("guild_id must be an integer"),
-        );
-
-        let commands = GuildId::set_application_commands(&guild_id, &ctx.http, |commands| {
+            let commands = GuildId::set_application_commands(&guild_id, &ctx.http, |commands| {
             commands
                 .create_application_command(|command| commands::deop::register(command))
                 .create_application_command(|command| commands::op::register(command))
@@ -69,24 +66,25 @@ impl EventHandler for Handler {
             .create_application_command(|command| commands::attachmentinput::register(command))*/
         })
         .await
-        .expect("Failed to register commands.");
+        .expect(format!("Failed to register commands for guild id: {}", guild).as_str());
 
-        /*Command::delete_global_application_command(&ctx.http, CommandId::from(1107873714357403718))
-        .await
-        .expect("Errored");*/
-        println!(
-            "I now have the following guild slash commands: {:?}",
-            commands
-        );
+            /*Command::delete_global_application_command(&ctx.http, CommandId::from(1107873714357403718))
+            .await
+            .expect("Errored");*/
+            println!(
+                "I now have the following guild slash commands: {:?}",
+                commands
+            );
+        }
 
-        let guild_command = Command::create_global_application_command(&ctx.http, |command| {
+        let global_command = Command::create_global_application_command(&ctx.http, |command| {
             commands::help::register(command)
         })
         .await;
 
         println!(
-            "I created the following global slash command: {:#?}",
-            guild_command
+            "I created the following global slash command: {:?}",
+            global_command
         );
     }
 }
@@ -95,13 +93,11 @@ impl EventHandler for Handler {
 async fn main() {
     // configure the bot.
     let config = Config::read_from_file("config.toml");
-    env::set_var("GUILD_ID", config.discord.guild_id);
     //print oauth join link
     println!(
         "Use this link to add the bot to your server: https://discord.com/api/oauth2/authorize?client_id={}&permissions={}&scope={}",
         config.discord.client_id, config.discord.perm_int, config.discord.scope
     );
-
     // Set gateway intents, which decides what events the bot will be notified about
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
@@ -115,11 +111,16 @@ async fn main() {
         .await
         .expect("Error creating client");
 
+    //make sure we drop the reference to `client` before continuing.
+    {
+        //add the config to the client
+        let mut data = client.data.write().await;
+        data.insert::<ConfigData>(config);
+    }
+
     // Finally, start a single shard, and start listening to events.
     //
     // Shards will automatically attempt to reconnect, and will perform
     // exponential backoff until it reconnects.
-    if let Err(why) = client.start().await {
-        println!("Client error: {:?}", why);
-    }
+    client.start().await.expect("Failed to initialize client");
 }

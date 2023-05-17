@@ -3,8 +3,12 @@ use serenity::model::prelude::command::CommandOptionType;
 use serenity::model::prelude::interaction::application_command::{
     ApplicationCommandInteraction, CommandDataOptionValue,
 };
+use serenity::model::prelude::*;
+use serenity::prelude::*;
 
-pub fn run(command: &ApplicationCommandInteraction) -> String {
+use crate::config::ConfigData;
+
+pub async fn run(ctx: &mut Context, command: &ApplicationCommandInteraction) -> String {
     let to_be_deoped = command
         .data
         .resolved
@@ -28,8 +32,8 @@ pub fn run(command: &ApplicationCommandInteraction) -> String {
         .resolved
         .as_ref()
         .expect("Expected user object");
-
-    let mut config = crate::Config::read_from_file("config.toml");
+    let mut data = ctx.data.write().await;
+    let config = data.get_mut::<ConfigData>().unwrap();
     if config
         .interaction
         .operators

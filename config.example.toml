@@ -1,8 +1,9 @@
 tos_path = "/balun/tos"
 privacy_path = "/balun/privacy"
+path = "config.toml"
 
 [discord]
-guild_id = ""
+guild_ids = [1234567890,9876543210]
 token = ""
 client_id = ""
 perm_int = 326484716608

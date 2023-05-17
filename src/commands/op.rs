@@ -1,10 +1,16 @@
+use std::ops::Deref;
+
 use serenity::builder::CreateApplicationCommand;
 use serenity::model::prelude::command::CommandOptionType;
 use serenity::model::prelude::interaction::application_command::{
     ApplicationCommandInteraction, CommandDataOptionValue,
 };
+use serenity::model::prelude::*;
+use serenity::prelude::*;
 
-pub fn run(command: &ApplicationCommandInteraction) -> String {
+use crate::config::{Config, ConfigData};
+
+pub async fn run(ctx: &mut Context, command: &ApplicationCommandInteraction) -> String {
     let to_be_oped = command
         .data
         .resolved
@@ -33,7 +39,8 @@ pub fn run(command: &ApplicationCommandInteraction) -> String {
         .as_ref()
         .expect("Expected user object");
 
-    let mut config = crate::Config::read_from_file("config.toml");
+    let mut data = ctx.data.write().await;
+    let config = data.get_mut::<ConfigData>().unwrap();
     if config
         .interaction
         .operators

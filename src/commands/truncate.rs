@@ -2,6 +2,10 @@ use serenity::builder::CreateApplicationCommand;
 use serenity::model::prelude::interaction::application_command::{
     ApplicationCommandInteraction, CommandDataOptionValue,
 };
+use serenity::model::prelude::*;
+use serenity::prelude::*;
+
+use crate::config::ConfigData;
 
 #[derive(Debug)]
 enum Timescale {
@@ -10,7 +14,7 @@ enum Timescale {
     DAYS,
 }
 
-pub fn run(options: &ApplicationCommandInteraction) -> String {
+pub async fn run(ctx: &mut Context, options: &ApplicationCommandInteraction) -> String {
     let CommandDataOptionValue::Integer(amount) = options
         .data
         .options
@@ -31,7 +35,23 @@ pub fn run(options: &ApplicationCommandInteraction) -> String {
         .expect("Expected string") else {
             return "Expected string for timescale.".into();
         };
+    let calling_member = options
+        .member
+        .clone()
+        .expect("failed to get command member.")
+        .user
+        .id;
 
+    let mut data = ctx.data.write().await;
+    let config = data.get_mut::<ConfigData>().unwrap();
+
+    if !config
+        .interaction
+        .operators
+        .contains(&i64::try_from(calling_member).unwrap())
+    {
+        return "You must be a bot operator to use this command.".into();
+    }
     let parsed_timescale: Timescale = match timescale.to_lowercase().as_str() {
         "m" | "min" | "mins" | "minute" | "minutes" => Timescale::MINUTES,
         "h" | "hour" | "hours" => Timescale::HOURS,

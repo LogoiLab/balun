@@ -25,7 +25,7 @@ impl EventHandler for Handler {
             println!("Received command interaction: {:#?}", command);
 
             let content = match command.data.name.as_str() {
-                "ping" => commands::ping::run(&command.data.options),
+                "ping" => commands::ping::run(&command),
                 "op" => commands::op::run(&mut ctx, &command).await,
                 "deop" => commands::deop::run(&mut ctx, &command).await,
                 "help" => commands::help::run(&command.data.options),
@@ -56,6 +56,7 @@ impl EventHandler for Handler {
 
             let commands = GuildId::set_application_commands(&guild_id, &ctx.http, |commands| {
             commands
+                .create_application_command(|command| commands::ping::register(command))
                 .create_application_command(|command| commands::deop::register(command))
                 .create_application_command(|command| commands::op::register(command))
                 .create_application_command(|command| commands::truncate::register(command))

@@ -27,6 +27,9 @@ impl EventHandler for Handler {
             let content = match command.data.name.as_str() {
                 "ping" => commands::ping::run(&command.data.options),
                 "op" => commands::op::run(&command),
+                "deop" => commands::deop::run(&command),
+                "help" => commands::help::run(&command.data.options),
+                "truncate" => commands::truncate::run(&command),
                 //"attachmentinput" => commands::attachmentinput::run(&command.data.options),
                 _ => "not implemented :(".to_string(),
             };
@@ -56,8 +59,9 @@ impl EventHandler for Handler {
 
         let commands = GuildId::set_application_commands(&guild_id, &ctx.http, |commands| {
             commands
-                .create_application_command(|command| commands::ping::register(command))
+                .create_application_command(|command| commands::deop::register(command))
                 .create_application_command(|command| commands::op::register(command))
+                .create_application_command(|command| commands::truncate::register(command))
 
             /*.create_application_command(|command| commands::id::register(command))
             .create_application_command(|command| commands::welcome::register(command))
@@ -75,15 +79,15 @@ impl EventHandler for Handler {
             commands
         );
 
-        /*let guild_command = Command::create_global_application_command(&ctx.http, |command| {
-            commands::ping::register(command)
+        let guild_command = Command::create_global_application_command(&ctx.http, |command| {
+            commands::help::register(command)
         })
         .await;
 
         println!(
             "I created the following global slash command: {:#?}",
             guild_command
-        );*/
+        );
     }
 }
 

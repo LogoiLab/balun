@@ -5,7 +5,7 @@ use serenity::model::prelude::interaction::application_command::{
 };
 
 pub fn run(command: &ApplicationCommandInteraction) -> String {
-    let to_be_oped = command
+    let to_be_deoped = command
         .data
         .resolved
         .users
@@ -18,12 +18,8 @@ pub fn run(command: &ApplicationCommandInteraction) -> String {
         .expect("failed to get command member.")
         .user
         .id;
-    if to_be_oped.as_u64() == calling_member.as_u64() {
-        return "You are already a bot operator.".into();
-    } else {
-        println!("to be oped: {:?}", to_be_oped);
-        println!("calling member: {:?}", calling_member);
-    }
+    println!("to be oped: {:?}", to_be_deoped);
+    println!("calling member: {:?}", calling_member);
     let option = command
         .data
         .options
@@ -40,17 +36,21 @@ pub fn run(command: &ApplicationCommandInteraction) -> String {
         .contains(&i64::try_from(calling_member.as_u64().clone()).unwrap())
     {
         if let CommandDataOptionValue::User(_user, _member) = option {
-            config
-                .interaction
-                .operators
-                .push(to_be_oped.as_u64().clone() as i64);
-            config.save();
-            return format!(
-                "<@{}> has been added to the bot operators list by <@{}>.",
-                to_be_oped, calling_member
-            );
+            for i in 0..config.interaction.operators.len() {
+                if config.interaction.operators.get(i).unwrap().clone()
+                    == to_be_deoped.as_u64().clone() as i64
+                {
+                    config.interaction.operators.remove(i);
+                    config.save();
+                    return format!(
+                        "<@{}> has been removed from the bot operators list by <@{}>.",
+                        to_be_deoped, calling_member
+                    );
+                }
+            }
+            return format!("User <@{}> not found in operators list.", to_be_deoped);
         } else {
-            return "Please provide a valid user".into();
+            return "Please provide a valid user.".into();
         }
     } else {
         return "You do not have permission to access that command.".into();
@@ -59,12 +59,12 @@ pub fn run(command: &ApplicationCommandInteraction) -> String {
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command
-        .name("op")
-        .description("Allow a user to use privileged bot features.")
+        .name("deop")
+        .description("Disallows a privileged user from accessing privileged bot features.")
         .create_option(|option| {
             option
                 .name("user")
-                .description("The user to add")
+                .description("The user to remove")
                 .kind(CommandOptionType::User)
                 .required(true)
         })

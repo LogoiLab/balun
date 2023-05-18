@@ -25,6 +25,7 @@ impl EventHandler for Handler {
             println!("Received command interaction: {:#?}", command);
 
             let content = match command.data.name.as_str() {
+                "amisus" => commands::amisus::run(&mut ctx, &command).await,
                 "ping" => commands::ping::run(&command),
                 "op" => commands::op::run(&mut ctx, &command).await,
                 "deop" => commands::deop::run(&mut ctx, &command).await,
@@ -56,6 +57,7 @@ impl EventHandler for Handler {
 
             let commands = GuildId::set_application_commands(&guild_id, &ctx.http, |commands| {
             commands
+                .create_application_command(|command| commands::amisus::register(command))
                 .create_application_command(|command| commands::ping::register(command))
                 .create_application_command(|command| commands::deop::register(command))
                 .create_application_command(|command| commands::op::register(command))

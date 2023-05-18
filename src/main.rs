@@ -4,6 +4,7 @@
 mod commands;
 mod config;
 mod database;
+mod permissions;
 
 use std::env;
 
@@ -25,28 +26,35 @@ struct Handler {
 impl EventHandler for Handler {
     async fn interaction_create(&self, mut ctx: Context, interaction: Interaction) {
         if let Interaction::ApplicationCommand(command) = interaction {
-            println!("Received command interaction: {:#?}", command);
+            println!("Received command interaction: {:?}", command);
 
-            let content = match command.data.name.as_str() {
-                "amisus" => commands::amisus::run(&mut ctx, &command).await,
+            let content: String = match command.data.name.as_str() {
+                "amisus" => commands::amisus::run(&mut ctx, &command, &self.database).await,
                 "ping" => commands::ping::run(&command),
-                "op" => commands::op::run(&mut ctx, &command).await,
-                "deop" => commands::deop::run(&mut ctx, &command).await,
+                "op" => commands::op::run(&mut ctx, &command, &self.database).await,
+                "deop" => commands::deop::run(&mut ctx, &command, &self.database).await,
+                "balun_ban" => commands::ban::run(&mut ctx, &command, &self.database).await,
+                "balun_unban" => commands::unban::run(&mut ctx, &command, &self.database).await,
+
                 "help" => commands::help::run(&command.data.options),
-                "truncate" => commands::truncate::run(&mut ctx, &command).await,
+                "truncate" => commands::truncate::run(&mut ctx, &command, &self.database).await,
                 //"attachmentinput" => commands::attachmentinput::run(&command.data.options),
                 _ => "not implemented :(".to_string(),
             };
 
-            if let Err(why) = command
-                .create_interaction_response(&ctx.http, |response| {
-                    response
-                        .kind(InteractionResponseType::ChannelMessageWithSource)
-                        .interaction_response_data(|message| message.content(content))
-                })
-                .await
-            {
-                println!("Cannot respond to slash command: {}", why);
+            if content.contains("NOT_ALLOWED_huaeouiyt") {
+                println!("Cannot respond to slash command: NOT_ALLOWED triggered.");
+            } else {
+                if let Err(why) = command
+                    .create_interaction_response(&ctx.http, |response| {
+                        response
+                            .kind(InteractionResponseType::ChannelMessageWithSource)
+                            .interaction_response_data(|message| message.content(content))
+                    })
+                    .await
+                {
+                    println!("Cannot respond to slash command: {}", why);
+                }
             }
         }
     }
@@ -64,6 +72,8 @@ impl EventHandler for Handler {
                 .create_application_command(|command| commands::ping::register(command))
                 .create_application_command(|command| commands::deop::register(command))
                 .create_application_command(|command| commands::op::register(command))
+                .create_application_command(|command| commands::ban::register(command))
+                .create_application_command(|command| commands::unban::register(command))
                 .create_application_command(|command| commands::truncate::register(command))
 
             /*.create_application_command(|command| commands::id::register(command))
@@ -78,8 +88,8 @@ impl EventHandler for Handler {
             .await
             .expect("Errored");*/
             println!(
-                "I now have the following guild slash commands: {:?}",
-                commands
+                "I now have the following slash commands for guild {}: {:?}",
+                guild, commands
             );
         }
 
@@ -113,7 +123,9 @@ async fn main() {
     // automatically prepend your bot token with "Bot ", which is a requirement
     // by Discord for bot users.
     let mut client = Client::builder(&config.discord.token, intents)
-        .event_handler(Handler)
+        .event_handler(Handler {
+            database: database::setup(&config).await,
+        })
         .await
         .expect("Error creating client");
 

@@ -14,7 +14,12 @@ enum Timescale {
     DAYS,
 }
 
-pub async fn run(ctx: &mut Context, options: &ApplicationCommandInteraction) -> String {
+pub async fn run(
+    ctx: &mut Context,
+    options: &ApplicationCommandInteraction,
+    dbcon: &sqlx::SqlitePool,
+) -> String {
+    let calling_guild = options.guild_id.expect("Could not get guild id.");
     let CommandDataOptionValue::Integer(amount) = options
         .data
         .options
@@ -45,10 +50,13 @@ pub async fn run(ctx: &mut Context, options: &ApplicationCommandInteraction) -> 
     let mut data = ctx.data.write().await;
     let config = data.get_mut::<ConfigData>().unwrap();
 
-    if !config
-        .interaction
-        .operators
-        .contains(&i64::try_from(calling_member).unwrap())
+    if !crate::permissions::is_operator(
+        calling_member.as_u64(),
+        calling_guild.as_u64(),
+        dbcon,
+        config,
+    )
+    .await
     {
         return "You must be a bot operator to use this command.".into();
     }
@@ -69,7 +77,7 @@ pub async fn run(ctx: &mut Context, options: &ApplicationCommandInteraction) -> 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command
         .name("truncate")
-        .description("Set a dissapearing message time limit for the current channel.")
+        .description("Set a dissapearing message time limit for the current channel")
         .create_option(|option| {
             option
                 .name("amount")

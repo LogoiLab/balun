@@ -10,13 +10,21 @@ use serenity::prelude::*;
 
 use crate::config::{Config, ConfigData};
 
-pub async fn run(_ctx: &mut Context, command: &ApplicationCommandInteraction) -> String {
+pub async fn run(
+    _ctx: &mut Context,
+    command: &ApplicationCommandInteraction,
+    dbcon: &sqlx::SqlitePool,
+) -> String {
+    let calling_guild = command.guild_id.expect("Could not get guild_id");
     let calling_member = command
         .member
         .clone()
         .expect("failed to get command member.")
         .user
         .id;
+    if crate::permissions::is_banned(calling_member.as_u64(), calling_guild.as_u64(), dbcon).await {
+        return "NOT_ALLOWED_huaeouiyt".into();
+    }
     return get_sus_factor(calling_member.as_u64()).await;
 }
 
@@ -30,13 +38,38 @@ async fn get_sus_factor(user_id: &u64) -> String {
     let impostor = get_sus_impostor(user_id).await;
     let color = get_sus_color(user_id).await;
     match user_id % 6 {
-        0 => return format!("<@{}> is a cute {}{} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_CUTE),
-        1 => return format!("<@{}> is a small {}{} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_SMALL),
-        2 => return format!("<@{}> is a lucky {}{} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_LUCKY),
-        3 => return format!("<@{}> is a thicc {}{} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_THICC),
-        4 => return format!("<@{}> is a {} {} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_DEFAULT),
+        0 => {
+            return format!(
+                "<@{}> is a cute {}{} Caught in 4k on security cams:\n{}{}",
+                user_id, color.0, impostor, color.1, SUS_CUTE
+            )
+        }
+        1 => {
+            return format!(
+                "<@{}> is a small {}{} Caught in 4k on security cams:\n{}{}",
+                user_id, color.0, impostor, color.1, SUS_SMALL
+            )
+        }
+        2 => {
+            return format!(
+                "<@{}> is a lucky {}{} Caught in 4k on security cams:\n{}{}",
+                user_id, color.0, impostor, color.1, SUS_LUCKY
+            )
+        }
+        3 => {
+            return format!(
+                "<@{}> is a thicc {}{} Caught in 4k on security cams:\n{}{}",
+                user_id, color.0, impostor, color.1, SUS_THICC
+            )
+        }
+        4 => {
+            return format!(
+                "<@{}> is a {} {} Caught in 4k on security cams:\n{}{}",
+                user_id, color.0, impostor, color.1, SUS_DEFAULT
+            )
+        }
         5 => return format!("<@{}> is not very sus.", user_id),
-        _ =>  return format!("<@{}> is an impostor!", user_id),
+        _ => return format!("<@{}> is an impostor!", user_id),
     }
 }
 

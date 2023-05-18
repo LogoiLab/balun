@@ -1,15 +1,15 @@
 pub struct DatabaseData;
 
 impl serenity::prelude::TypeMapKey for DatabaseData {
-    type Value = Connection;
+    type Value = sqlx::SqlitePool;
 }
 
-pub fn setup(config: &crate::config::Config) {
+pub async fn setup(config: &crate::config::Config) -> sqlx::SqlitePool {
     let database = sqlx::sqlite::SqlitePoolOptions::new()
         .max_connections(5)
         .connect_with(
             sqlx::sqlite::SqliteConnectOptions::new()
-                .filename("database.sqlite")
+                .filename(config.database_path.clone())
                 .create_if_missing(true),
         )
         .await

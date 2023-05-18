@@ -1,12 +1,13 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
-use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     pub tos_path: String,
     pub privacy_path: String,
+    pub database_path: String,
     pub discord: DiscordConfig,
     pub webserver: WebConfig,
     pub interaction: IntConfig,

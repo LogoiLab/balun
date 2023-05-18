@@ -1,5 +1,6 @@
 tos_path = "/balun/tos"
 privacy_path = "/balun/privacy"
+database_path = "database.sqlite"
 path = "config.toml"
 
 [discord]
@@ -14,4 +15,4 @@ listen_address = "127.0.0.1"
 listen_port = 8686
 
 [interaction]
-operators = [1234567890, 9876543210]
+owner = 1234567890

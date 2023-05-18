@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use serenity::builder::CreateApplicationCommand;
 use serenity::model::prelude::command::CommandOptionType;
 use serenity::model::prelude::interaction::application_command::{
@@ -8,7 +6,7 @@ use serenity::model::prelude::interaction::application_command::{
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
-use crate::config::{Config, ConfigData};
+use crate::config::ConfigData;
 
 pub async fn run(
     ctx: &mut Context,
@@ -16,7 +14,7 @@ pub async fn run(
     dbcon: &sqlx::SqlitePool,
 ) -> String {
     let calling_guild = command.guild_id.expect("failed to get guild_id");
-    let to_be_oped = command
+    let to_be_unbanned = command
         .data
         .resolved
         .users
@@ -49,22 +47,17 @@ pub async fn run(
     )
     .await
     {
-        if to_be_oped.as_u64() == calling_member.as_u64() {
-            return "You are already a bot operator.".into();
-        } else {
-            println!(
-                "to be oped: {:?}, by: {:?}, in: {:?}",
-                to_be_oped, calling_member, calling_guild
-            );
-        }
+        println!(
+            "to be unbanned: {:?}, by: {:?}, in: {:?}",
+            to_be_unbanned, calling_member, calling_guild
+        );
 
         if let CommandDataOptionValue::User(_user, _member) = option {
-            crate::permissions::add_operator(to_be_oped.as_u64(), calling_guild.as_u64(), dbcon)
-                .await;
+            crate::permissions::unban(to_be_unbanned.as_u64(), calling_guild.as_u64(), dbcon).await;
             config.save();
             return format!(
-                "<@{}> has been added to the bot operators list by <@{}>.",
-                to_be_oped, calling_member
+                "<@{}> has been unbanned by <@{}>.",
+                to_be_unbanned, calling_member
             );
         } else {
             return "Please provide a valid user".into();
@@ -76,12 +69,12 @@ pub async fn run(
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command
-        .name("op")
-        .description("Allow a user to use privileged bot features")
+        .name("balun_unban")
+        .description("Allows a banned user to interact with the bot")
         .create_option(|option| {
             option
                 .name("user")
-                .description("The user to add")
+                .description("The user to unban")
                 .kind(CommandOptionType::User)
                 .required(true)
         })

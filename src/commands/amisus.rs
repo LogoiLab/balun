@@ -29,33 +29,32 @@ pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicatio
 async fn get_sus_factor(user_id: &u64) -> String {
     let impostor = get_sus_impostor(user_id).await;
     let color = get_sus_color(user_id).await;
-match user_id % 6 {
-    0 => return format!("<@{}> is a cute {} {} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_CUTE),
-    1 => return format!("<@{}> is a small {} {} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_SMALL),
-    2 => return format!("<@{}> is a lucky {} {} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_LUCKY),
-    3 => return format!("<@{}> is a thicc {} {} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_THICC),
-    4 => return format!("<@{}> is a {} {} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_DEFAULT),
-    5 => return format!("<@{}> is not very sus.", user_id),
-    _ =>  return format!("<@{}> is an impostor!", user_id),
-
-}
+    match user_id % 6 {
+        0 => return format!("<@{}> is a cute {}{} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_CUTE),
+        1 => return format!("<@{}> is a small {}{} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_SMALL),
+        2 => return format!("<@{}> is a lucky {}{} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_LUCKY),
+        3 => return format!("<@{}> is a thicc {}{} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_THICC),
+        4 => return format!("<@{}> is a {} {} Caught in 4k on security cams:\n{}{}", user_id, color.0, impostor, color.1, SUS_DEFAULT),
+        5 => return format!("<@{}> is not very sus.", user_id),
+        _ =>  return format!("<@{}> is an impostor!", user_id),
+    }
 }
 
 async fn get_sus_impostor(user_id: &u64) -> String {
-match user_id % 10 {
-    0 => return "impostor!".into(),
-    _ => return "crewmate.".into(),
-}
+    match user_id % 10 {
+        0 => return "impostor!".into(),
+        _ => return "crewmate.".into(),
+    }
 }
 
 async fn get_sus_color(user_id: &u64) -> (String, String) {
-match user_id % 4 {
-    0 => return ("light blue".into(), "```yaml\n".into()),
-    1 => return ("yellow".into(), "```fix\n".into()),
-    2 => return ("orange".into(), "```arm\n".into()),
-    3 => return ("blue".into(), "```css\n".into()),
-    _ => return ("light blue".into(), "```yaml\n".into()),
-}
+    match user_id % 4 {
+        0 => return ("".into(), "```\n".into()),
+        1 => return ("".into(), "```\n".into()),
+        2 => return ("".into(), "```\n".into()),
+        3 => return ("".into(), "```\n".into()),
+        _ => return ("".into(), "```\n".into()),
+    }
 }
 
 static SUS_CUTE: &str = r#"

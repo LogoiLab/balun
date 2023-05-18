@@ -3,6 +3,7 @@
 
 mod commands;
 mod config;
+mod database;
 
 use std::env;
 
@@ -16,7 +17,9 @@ use serenity::prelude::*;
 
 use crate::config::{Config, ConfigData};
 
-struct Handler;
+struct Handler {
+    database: sqlx::SqlitePool,
+}
 
 #[async_trait]
 impl EventHandler for Handler {

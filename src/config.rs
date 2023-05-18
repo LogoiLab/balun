@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::Write;
+use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
@@ -29,7 +30,7 @@ pub struct WebConfig {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IntConfig {
-    pub operators: Vec<i64>,
+    pub owner: i64,
 }
 
 pub struct ConfigData;

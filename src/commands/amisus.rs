@@ -40,25 +40,25 @@ async fn get_sus_factor(user_id: &u64) -> String {
     match user_id % 6 {
         0 => {
             return format!(
-                "<@{}> is a cute {}{} Caught in 4k on security cams:\n{}{}",
+                "<@{}> is a cute {} {} Caught in 4k on security cams:\n{}{}",
                 user_id, color.0, impostor, color.1, SUS_CUTE
             )
         }
         1 => {
             return format!(
-                "<@{}> is a small {}{} Caught in 4k on security cams:\n{}{}",
+                "<@{}> is a small {} {} Caught in 4k on security cams:\n{}{}",
                 user_id, color.0, impostor, color.1, SUS_SMALL
             )
         }
         2 => {
             return format!(
-                "<@{}> is a lucky {}{} Caught in 4k on security cams:\n{}{}",
+                "<@{}> is a lucky {} {} Caught in 4k on security cams:\n{}{}",
                 user_id, color.0, impostor, color.1, SUS_LUCKY
             )
         }
         3 => {
             return format!(
-                "<@{}> is a thicc {}{} Caught in 4k on security cams:\n{}{}",
+                "<@{}> is a thicc {} {} Caught in 4k on security cams:\n{}{}",
                 user_id, color.0, impostor, color.1, SUS_THICC
             )
         }
@@ -81,12 +81,13 @@ async fn get_sus_impostor(user_id: &u64) -> String {
 }
 
 async fn get_sus_color(user_id: &u64) -> (String, String) {
-    match user_id % 4 {
-        0 => return ("".into(), "```\n".into()),
-        1 => return ("".into(), "```\n".into()),
-        2 => return ("".into(), "```\n".into()),
-        3 => return ("".into(), "```\n".into()),
-        _ => return ("".into(), "```\n".into()),
+    match user_id % 5 {
+        0 => return ("red".into(), "```ansi\n\\u001b[0;31m".into()),
+        1 => return ("green".into(), "```ansi\n\\u001b[0;32m".into()),
+        2 => return ("yellow".into(), "```ansi\n\\u001b[0;33m".into()),
+        3 => return ("blue".into(), "```ansi\n\\u001b[0;34m".into()),
+        4 => return ("pink".into(), "```ansi\n\\u001b[0;35m".into()),
+        _ => return ("white".into(), "```ansi\n\\u001b[0;37m".into()),
     }
 }
 
@@ -106,7 +107,7 @@ static SUS_CUTE: &str = r#"
 ⠄⠄⠄⠛⠿⣿⣿⣿⣿⣷⣤⡀⠄⠄⠄⠄⠈⠹⣿⣿⣇⣀⠄⣠⣾⣿⣿⡇⠄⠄
 ⠄⠄⠄⠄⠄⠄⠄⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠄⠄⠄
 ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠄⠄⠄⠄
-⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠈⠉⠉⠉⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠈⠉⠉⠉⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\u001b[0;0m
 ```
 "#;
 static SUS_SMALL: &str = r#"
@@ -124,7 +125,7 @@ static SUS_SMALL: &str = r#"
 ⠄⠄⠄⠄⠄⠄⠄⣿⣿⠄⠄⠄⠄⠄⣿⣿⡇⠄⣽⣿⡏⠁⠄⠄⢸⣿⡇⠄⠄⠄
 ⠄⠄⠄⠄⠄⠄⠄⣿⣿⠄⠄⠄⠄⠄⣿⣿⡇⠄⢹⣿⡆⠄⠄⠄⣸⣿⠇⠄⠄⠄
 ⠄⠄⠄⠄⠄⠄⠄⢿⣿⣦⣄⣀⣠⣴⣿⣿⠁⠄⠈⠻⣿⣿⣿⣿⡿⠏⠄⠄⠄⠄
-⠄⠄⠄⠄⠄⠄⠄⠈⠛⠻⠿⠿⠿⠿⠋⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+⠄⠄⠄⠄⠄⠄⠄⠈⠛⠻⠿⠿⠿⠿⠋⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\u001b[0;0m
 ```
 "#;
 static SUS_LUCKY: &str = r#"
@@ -153,7 +154,7 @@ static SUS_LUCKY: &str = r#"
 ⠄⠄⠄⠄⠄⠄⠄⣿⣿⠄⠄⠄⠄⠄⣿⣿⡇⠄⣽⣿⡏⠁⠄⠄⢸⣿⡇⠄⠄⠄
 ⠄⠄⠄⠄⠄⠄⠄⣿⣿⠄⠄⠄⠄⠄⣿⣿⡇⠄⢹⣿⡆⠄⠄⠄⣸⣿⠇⠄⠄⠄
 ⠄⠄⠄⠄⠄⠄⠄⢿⣿⣦⣄⣀⣠⣴⣿⣿⠁⠄⠈⠻⣿⣿⣿⣿⡿⠏⠄⠄⠄⠄
-⠄⠄⠄⠄⠄⠄⠄⠈⠛⠻⠿⠿⠿⠿⠋⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+⠄⠄⠄⠄⠄⠄⠄⠈⠛⠻⠿⠿⠿⠿⠋⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\u001b[0;0m
 ```
 "#;
 static SUS_THICC: &str = r#"
@@ -169,7 +170,7 @@ static SUS_THICC: &str = r#"
 ⠄⠄⠄⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠃⠘⠛
 ⠄⠄⠄⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠋⣀⣀⣠⣤
 ⠄⠄⣀⣀⡙⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⢛⣩⠤⠾⠄⠛⠋⠉⢉
-⠄⠺⠿⠛⠛⠃⠄⠉⠙⠛⠛⠻⠿⠿⠿⠟⠛⠛⠛⠉⠁⠄⠄⣀⣀⣠⣤⣠⣴⣶⣼⣿
+⠄⠺⠿⠛⠛⠃⠄⠉⠙⠛⠛⠻⠿⠿⠿⠟⠛⠛⠛⠉⠁⠄⠄⣀⣀⣠⣤⣠⣴⣶⣼⣿\u001b[0;0m
 ```
 "#;
 static SUS_DEFAULT: &str = r#"
@@ -191,6 +192,6 @@ static SUS_DEFAULT: &str = r#"
 ⠄⠄⠄⠄⠄⠄⠄⣿⣿⠄⠄⠄⠄⠄⣿⣿⡇⠄⣽⣿⡏⠁⠄⠄⢸⣿⡇⠄⠄⠄
 ⠄⠄⠄⠄⠄⠄⠄⣿⣿⠄⠄⠄⠄⠄⣿⣿⡇⠄⢹⣿⡆⠄⠄⠄⣸⣿⠇⠄⠄⠄
 ⠄⠄⠄⠄⠄⠄⠄⢿⣿⣦⣄⣀⣠⣴⣿⣿⠁⠄⠈⠻⣿⣿⣿⣿⡿⠏⠄⠄⠄⠄
-⠄⠄⠄⠄⠄⠄⠄⠈⠛⠻⠿⠿⠿⠿⠋⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+⠄⠄⠄⠄⠄⠄⠄⠈⠛⠻⠿⠿⠿⠿⠋⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\u001b[0;0m
 ```
 "#;

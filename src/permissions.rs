@@ -134,7 +134,7 @@ pub async fn is_serious_channel(
     .await
     .unwrap();
     for row in rows.iter() {
-        if row.guild_id == Some(guild_id) {
+        if row.guild_id == guild_id {
             return true;
         }
     }

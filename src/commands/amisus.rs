@@ -16,13 +16,21 @@ pub async fn run(
     dbcon: &sqlx::SqlitePool,
 ) -> String {
     let calling_guild = command.guild_id.expect("Could not get guild_id");
+    let calling_channel = command.channel_id;
     let calling_member = command
         .member
         .clone()
         .expect("failed to get command member.")
         .user
         .id;
-    if crate::permissions::is_banned(calling_member.as_u64(), calling_guild.as_u64(), dbcon).await {
+    if crate::permissions::is_banned(calling_member.as_u64(), calling_guild.as_u64(), dbcon).await
+        || crate::permissions::is_serious_channel(
+            calling_channel.as_u64(),
+            calling_guild.as_u64(),
+            dbcon,
+        )
+        .await
+    {
         return "NOT_ALLOWED_huaeouiyt".into();
     }
     return get_sus_factor(calling_member.as_u64()).await;

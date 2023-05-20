@@ -35,7 +35,7 @@ impl EventHandler for Handler {
                 "deop" => commands::deop::run(&mut ctx, &command, &self.database).await,
                 "balun_ban" => commands::ban::run(&mut ctx, &command, &self.database).await,
                 "balun_unban" => commands::unban::run(&mut ctx, &command, &self.database).await,
-
+                "serious" => commands::serious::run(&mut ctx, &command, &self.database).await,
                 "help" => commands::help::run(&command.data.options),
                 "truncate" => commands::truncate::run(&mut ctx, &command, &self.database).await,
                 //"attachmentinput" => commands::attachmentinput::run(&command.data.options),
@@ -74,6 +74,7 @@ impl EventHandler for Handler {
                 .create_application_command(|command| commands::op::register(command))
                 .create_application_command(|command| commands::ban::register(command))
                 .create_application_command(|command| commands::unban::register(command))
+                .create_application_command(|command| commands::serious::register(command))
                 .create_application_command(|command| commands::truncate::register(command))
 
             /*.create_application_command(|command| commands::id::register(command))

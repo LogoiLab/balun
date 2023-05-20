@@ -43,7 +43,20 @@ impl EventHandler for Handler {
             };
 
             if content.contains("NOT_ALLOWED_huaeouiyt") {
-                println!("Cannot respond to slash command: NOT_ALLOWED triggered.");
+                if let Err(why) = command
+                    .create_interaction_response(&ctx.http, |response| {
+                        response
+                            .kind(InteractionResponseType::ChannelMessageWithSource)
+                            .interaction_response_data(|message| {
+                                message
+                                    .content("That is not allowed.".to_string())
+                                    .ephemeral(true)
+                            })
+                    })
+                    .await
+                {
+                    println!("Cannot ephemeral reply to slash command: {}", why);
+                }
             } else {
                 if let Err(why) = command
                     .create_interaction_response(&ctx.http, |response| {

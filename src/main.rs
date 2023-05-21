@@ -20,6 +20,7 @@ use crate::config::{Config, ConfigData};
 
 struct Handler {
     database: sqlx::SqlitePool,
+    truncator: crate::commands::truncate::Manage,
 }
 
 #[async_trait]

@@ -5,6 +5,9 @@ use serenity::model::prelude::interaction::application_command::{
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
+use std::collections::HashMap;
+use std::time::{SystemTime, UNIX_EPOCH};
+
 use crate::config::ConfigData;
 
 #[derive(Debug)]
@@ -12,6 +15,30 @@ enum Timescale {
     MINUTES,
     HOURS,
     DAYS,
+}
+
+pub struct Manage {
+    thread: tokio::task::JoinHandle<()>,
+    seen_messages: HashMap<u64, Vec<(u64, u64)>>,
+}
+
+impl Manage {
+    pub fn register(dbcon: &sqlx::SqlitePool) -> Self {
+        let thread = Manage {
+            thread: tokio::spawn(async move {
+                // https://serenity-rs.github.io/serenity/current/serenity/builder/struct.GetMessages.html
+                // https://serenity-rs.github.io/serenity/current/serenity/model/prelude/struct.ChannelId.html#method.delete_message
+            }),
+            seen_messages: HashMap::new(),
+        };
+        return thread;
+    }
+}
+
+pub struct ManageData;
+
+impl serenity::prelude::TypeMapKey for ManageData {
+    type Value = Manage;
 }
 
 pub async fn run(
